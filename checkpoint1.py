@@ -1,2 +1,2 @@
-guess = input("Enter a guess: ")
-print(guess)
+guess = input("What's your guess? ")
+print("Your guess was " + guess)
