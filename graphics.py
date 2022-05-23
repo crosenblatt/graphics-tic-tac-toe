@@ -200,6 +200,28 @@ def update(rate=None):
 
     _root.update()
 
+WORDLE_WIN_WIDTH = 200
+WORDLE_WIN_HEIGHT = 200
+
+SUBMIT_TOP_LEFT_X = 80
+SUBMIT_TOP_LEFT_Y = 170
+
+SUBMIT_BOTTOM_RIGHT_X = 120
+SUBMIT_BOTTOM_RIGHT_Y = 190
+
+SUBMIT_TEXT_X = 100
+SUBMIT_TEXT_Y = 180
+
+GUESSES_START_Y = 20
+GUESSES_END_Y = 140
+GUESSES_SKIP_Y = 20
+
+GUESSES_START_X = 20
+
+WIN_LOSS_X = 50
+WIN_LOSS_Y = 180
+
+
 ############################################################################
 # Graphics classes start here
         
@@ -397,7 +419,43 @@ class GraphWin(tk.Canvas):
             item.undraw()
             item.draw(self)
         self.update()
-        
+    
+class Guess:
+    def __init__(self, win, y):
+        self.letters = [Entry(Point(x, y), 1) for x in range(GUESSES_START_X, 120, 20)]
+
+        for letter in self.letters:
+            letter.draw(win)
+
+    def getLetter(self, index):
+        return self.letters[index]
+
+class WordleWin:
+    def __init__(self):
+        self.win = GraphWin("Wordle", WORDLE_WIN_WIDTH, WORDLE_WIN_HEIGHT)
+        submit_button = Rectangle(Point(SUBMIT_TOP_LEFT_X, SUBMIT_TOP_LEFT_Y), Point(SUBMIT_BOTTOM_RIGHT_X, SUBMIT_BOTTOM_RIGHT_Y))
+        submit_button.setFill("GRAY")
+        submit_button.draw(self.win)
+
+        submit_text = Text(Point(SUBMIT_TEXT_X, SUBMIT_TEXT_Y), "Submit")
+        submit_text.draw(self.win)
+    
+    def getMouse(self):
+        return self.win.getMouse()
+
+    def setupGuesses(self):
+        return [Guess(self.win, y) for y in range(GUESSES_START_Y, GUESSES_END_Y, GUESSES_SKIP_Y)]
+
+    def drawWinText(self):
+        text = Text(Point(WIN_LOSS_X, WIN_LOSS_Y), "You win!")
+        text.draw(self.win)
+
+    def drawLoseText(self):
+        text = Text(Point(WIN_LOSS_X, WIN_LOSS_Y), "You lose!")
+        text.draw(self.win)
+
+    def close(self):
+        self.win.close()
                       
 class Transform:
 
@@ -572,6 +630,9 @@ class Point(GraphicsObject):
                 
     def getX(self): return self.x
     def getY(self): return self.y
+
+    def isSubmitClick(self):
+        return SUBMIT_BOTTOM_RIGHT_X >= self.getX() >= SUBMIT_TOP_LEFT_X and SUBMIT_BOTTOM_RIGHT_Y >= self.getY() >= SUBMIT_TOP_LEFT_Y
 
 class _BBox(GraphicsObject):
     # Internal base class for objects represented by bounding box
